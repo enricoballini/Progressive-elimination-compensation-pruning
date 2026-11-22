@@ -1,0 +1,5 @@
+data/
+case_*/results/
+results_studies/
+logs/
+__pycache__/
