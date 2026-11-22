@@ -71,8 +71,8 @@ python tests/test_formulas.py                 # verification of the formulas (CP
 python case_1_mnist_dense/run.py 32 prelu     # one case; results in case_1_mnist_dense/results/
 ```
 
-`./run_all.sh` runs everything (several hours on a laptop GPU) with the Python interpreter found in the
-path, or with the one given by the environment variable `PYTHON`. Each case stores
+`./run_all.sh` runs everything (several hours on a laptop GPU) with the interpreter of `venv/` (created by `./install.sh`) or
+the one given by the environment variable `PYTHON`; it stops if a dataset is missing. Each case stores
 its results after every seed and resumes from the last completed one if interrupted.
 `python case_x/run.py ... --add method_a,method_b` adds methods to stored results.
 

@@ -1,16 +1,39 @@
 #!/bin/bash
 export XLA_PYTHON_CLIENT_PREALLOCATE=true
 export XLA_PYTHON_CLIENT_MEM_FRACTION=${GPU_FRACTION:-0.3}
-PY=${PYTHON:-python}
 cd "$(dirname "$0")"
 mkdir -p logs
 
+if [ -n "$PYTHON" ]; then
+    PY=$PYTHON
+elif [ -x venv/bin/python ]; then
+    PY=$PWD/venv/bin/python
+else
+    PY=python
+fi
+if ! "$PY" -c "import jax" 2> /dev/null; then
+    echo "$PY cannot import jax: run ./install.sh first, or set PYTHON=/path/to/python"
+    exit 1
+fi
+
+missing=0
+for f in data/mnist/train-images-idx3-ubyte.gz data/cifar10/data_batch_1.bin data/diffusion_sorption/1D_diff-sorp_NA_NA.h5; do
+    if [ ! -f "$f" ]; then
+        echo "missing dataset: $f"
+        missing=1
+    fi
+done
+if [ "$missing" = 1 ]; then
+    echo "see README.md (./install.sh --data downloads MNIST and CIFAR-10)"
+    exit 1
+fi
+
 run() {
     name=$1; shift
-    echo "=== $(date +%H:%M:%S) start $name" >> logs/queue.log
+    echo "=== $(date +%H:%M:%S) start $name" | tee -a logs/queue.log
     $PY "$@" > "logs/$name.log" 2>&1
     code=$?
-    echo "    $(date +%H:%M:%S) exit code $code ($name)" >> logs/queue.log
+    echo "    $(date +%H:%M:%S) exit code $code ($name)" | tee -a logs/queue.log
 }
 
 JAX_PLATFORMS=cpu run test_formulas tests/test_formulas.py
