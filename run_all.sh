@@ -16,20 +16,31 @@ if ! "$PY" -c "import jax" 2> /dev/null; then
     exit 1
 fi
 
+DIFFSORP=data/diffusion_sorption/1D_diff-sorp_NA_NA.h5
 missing=0
-for f in data/mnist/train-images-idx3-ubyte.gz data/cifar10/data_batch_1.bin data/diffusion_sorption/1D_diff-sorp_NA_NA.h5; do
+for f in data/mnist/train-images-idx3-ubyte.gz data/cifar10/data_batch_1.bin; do
     if [ ! -f "$f" ]; then
         echo "missing dataset: $f"
         missing=1
     fi
 done
 if [ "$missing" = 1 ]; then
-    echo "see README.md (./install.sh --data downloads MNIST and CIFAR-10)"
+    echo "./install.sh --data downloads MNIST and CIFAR-10"
     exit 1
+fi
+if [ ! -f "$DIFFSORP" ]; then
+    echo "missing dataset: $DIFFSORP (diffusion-sorption steps will be skipped)"
 fi
 
 run() {
     name=$1; shift
+    case "$name $*" in
+        *diffsorp*|*diffusion*)
+            if [ ! -f "$DIFFSORP" ]; then
+                echo "=== skipped $name (no diffusion-sorption data)" | tee -a logs/queue.log
+                return
+            fi ;;
+    esac
     echo "=== $(date +%H:%M:%S) start $name" | tee -a logs/queue.log
     $PY "$@" > "logs/$name.log" 2>&1
     code=$?
