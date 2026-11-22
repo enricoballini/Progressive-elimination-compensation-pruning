@@ -56,7 +56,7 @@ pruned = pruning.apply_masks_and_compensation(params, masks, existing, compensat
 
 ## Requirements and data
 
-Python 3.12 with the packages of `requirements.txt` (`pip install -r requirements.txt`; for a CPU-only installation replace `jax[cuda12]` by `jax`). The datasets are read from
+Python 3.12. `./install.sh` creates the virtual environment `venv/`, installs the packages of `requirements.txt` and runs `tests/test_formulas.py`; `--cpu` installs the CPU-only version of JAX and `--data` downloads MNIST and CIFAR-10 into `data/`. The datasets are read from
 `data/`:
 
 * `data/mnist/` : the four `*-ubyte.gz` files of MNIST;
