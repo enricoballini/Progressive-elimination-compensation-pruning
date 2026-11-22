@@ -17,19 +17,9 @@ if ! "$PY" -c "import jax" 2> /dev/null; then
 fi
 
 DIFFSORP=data/diffusion_sorption/1D_diff-sorp_NA_NA.h5
-missing=0
-for f in data/mnist/train-images-idx3-ubyte.gz data/cifar10/data_batch_1.bin; do
-    if [ ! -f "$f" ]; then
-        echo "missing dataset: $f"
-        missing=1
-    fi
-done
-if [ "$missing" = 1 ]; then
-    echo "./install.sh --data downloads MNIST and CIFAR-10"
-    exit 1
-fi
+./download_data.sh || exit 1
 if [ ! -f "$DIFFSORP" ]; then
-    echo "missing dataset: $DIFFSORP (diffusion-sorption steps will be skipped)"
+    echo "diffusion-sorption steps will be skipped"
 fi
 
 run() {
